@@ -1,3 +1,20 @@
-from datasets import load_dataset
+import datasets
+from pathlib import Path
+import os
 
-ds = load_dataset("GEM/e2e_nlg", data_dir="/home/kotsios/dsit/database_systems/database_systems_project/data/", trust_remote_code=True)
+DATA_DIR = os.path.join(
+    os.getcwd(),
+    "data/downloaded_e2e_dataset"
+)
+
+os.makedirs(    
+    DATA_DIR,
+    exist_ok=True
+)
+datasets.config.DOWNLOADED_DATASETS_PATH = Path(DATA_DIR)
+
+ds = datasets.load_dataset(
+    path="GEM/e2e_nlg", 
+    data_dir=DATA_DIR, 
+    trust_remote_code=True
+)
