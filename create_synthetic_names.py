@@ -12,7 +12,7 @@ token = os.getenv("HUGGINGFACE_HUB_TOKEN")
 if token:
     login(token)
 
-def get_formatted_prompt(tokenizer, prompt_factor: int = 20):
+def get_formatted_prompt(tokenizer=AutoTokenizer.from_pretrained("Qwen/Qwen3-4B"), prompt_factor: int = 20):
 	SHOP_NAMES = [
 		# Coffee Shops (50)
 		"Bean & Gone", "Brewed Awakening", "The Daily Grind", "Perk Up", "Kaffeine Fix",
@@ -51,14 +51,14 @@ def get_formatted_prompt(tokenizer, prompt_factor: int = 20):
 		"The Midnight Mug", "The Grog & Grub", "The Rowdy Raven", "The Broken Horn", "The Lost Lantern", "The Sly Toad"
 	]
 
-	GENERATE_RESTAURANT_NAMES_PROMPT_TEMPLATE = """You are a creative shop name suggester. Your task is to write a list of 100 unique names, in the format below.
+	GENERATE_RESTAURANT_NAMES_PROMPT_TEMPLATE = """You are a creative shop name suggester. Your task is to write a deduplicated python list of fifty (50) unique shop names.
 
-	Do not provide any additional information; just output a Python list of strings, wrapped between <list> and </list>.
+	Do not provide any additional information; just output a Python list of names.
 
 	A shop can be a restaurant, coffee shop, or pub.
 
-	Example output:
-	<list>[(1, '{}'), (2, '{}'), ..., (100, '{}')]</list>"""
+	Example names: {}, {}, {}.
+	"""
 
 	prompts = []
 	for _ in range(prompt_factor):
@@ -90,7 +90,7 @@ def main():
 	print("Loading model")
 	llm = LLM(
 		"Qwen/Qwen3-4B",
-		max_model_len=1000,
+		max_model_len=2000,
 		max_num_seqs=prompt_factor,
 		dtype="auto",
 		trust_remote_code=True,
@@ -100,12 +100,11 @@ def main():
 	tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen3-4B")
 
 	sampling_params = SamplingParams(
-		temperature=0.85,
+		temperature=0.7,
 		top_k=20,
 		top_p=0.8,
-		max_tokens=1300
+		max_tokens=3000
 	)
-
 
 	with open("data/unique_names.txt", "r") as f:
 		original_names = [line.strip() for line in f if line.strip()]
@@ -126,19 +125,18 @@ def main():
 			for output in outputs:
 				text = output.outputs[0].text.strip()
 
-				match = re.search(r"<list>(.*?)</list>", text, re.DOTALL)
+				match = re.search(r"\[(.*?)\]", text, re.DOTALL)
 
 				if not match:
-					print("No <list> tag found. Output was:")
+					print("No list found. Output was:")
 					print(text)
 					continue
 
-				list_tuples = match.group(1).strip()
+				list_str = match.group(1).strip()
 
 				try:
-					parsed_names = ast.literal_eval(list_tuples)
-					for i, name in parsed_names:
-						names.append(name)
+					parsed_names = ast.literal_eval(list_str)
+					names.extend(parsed_names)
 					names = list(set(names))
 				except Exception as e:
 					print(f"Parsing failed: {e}")
