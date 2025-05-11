@@ -1,80 +1,161 @@
 from vllm import LLM, SamplingParams
 from dotenv import load_dotenv
+from transformers import AutoTokenizer
 import os
 import ast
 import re
+import numpy as np
+from huggingface_hub import login
 
-# load_dotenv()
-# token = os.getenv("HUGGINGFACE_HUB_TOKEN")
-# if token:
-#     login(token)
+load_dotenv()
+token = os.getenv("HUGGINGFACE_HUB_TOKEN")
+if token:
+    login(token)
 
-llm = LLM("Qwen/Qwen3-1.7B")
+def get_formatted_prompt(tokenizer, prompt_factor: int = 20):
+	SHOP_NAMES = [
+		# Coffee Shops (50)
+		"Bean & Gone", "Brewed Awakening", "The Daily Grind", "Perk Up", "Kaffeine Fix",
+		"Steamy Beans", "Espresso Lane", "Mocha Muse", "Latte Love", "The Roasted Bean",
+		"Java Junction", "Caffeine Alley", "The Grind House", "Cup o’ Joy", "Drip Theory",
+		"Flat White & Co", "Sip Society", "The Cozy Mug", "Urban Brew", "Café Velvet",
+		"Morning Ritual", "Brewhouse Café", "Cuppa Cloud", "Artisan Bean", "The Pour Over",
+		"Steam Theory", "The Java Nook", "Coffee Republic", "Latte Lounge", "The Drip Stop",
+		"Midnight Mocha", "Wake Up Café", "Second Cup", "Mug Life", "The Roastery",
+		"Daily Drip", "Coffee Bloom", "Crimson Cup", "Bitter & Sweet", "Fuel & Filter",
+		"The Buzzing Bean", "Luna Latte", "Daily Dose", "Ground Control", "The Roasted Leaf",
+		"Whisk & Bean", "Black Gold", "Cozy Cup", "The Bean Scene", "Brew Social", "Cloud Nine Café",
 
-sampling_params = SamplingParams(
-    temperature=0.7,
-    top_k=20,
-    top_p=0.8,
-    max_tokens=8192
-)
+		# Restaurants (50)
+		"The Rice Boat", "Spice Symphony", "Golden Fork", "Olive & Thyme", "The Hungry Fox",
+		"Fork & Fable", "Little Lemon", "Saffron Table", "Salt & Fire", "The Green Olive",
+		"Crimson Curry", "Rustic Spoon", "Harvest Moon", "Blue Basil", "Ginger Flame",
+		"Luna Kitchen", "The Silver Chopstick", "Midnight Diner", "The Wandering Chef", "The Charred Oak",
+		"Urban Palate", "Tandoori Tales", "Maison Verde", "Fig & Fennel", "Bamboo Bowl",
+		"Cedar & Sage", "The Broken Plate", "Fried & True", "Nomad’s Nosh", "The Food Foundry",
+		"Peach & Pepper", "Hidden Fork", "The Gilded Wok", "The Wholesome Fork", "Plate & Pour",
+		"Wild Thyme", "Juniper Table", "The Brass Onion", "Coastal Cravings", "The Silk Table",
+		"Crave Street", "Spork & Spoon", "The Marble Kitchen", "Fire & Ice", "The Curry Leaf",
+		"Amalfi Kitchen", "Noodle & Bone", "The Spicy Mango", "Mezza Luna", "The Tasty Turnip", "Crust & Crumble",
 
-GENERATE_RESTAURANT_NAMES_PROMPT = """/no_think Your task is to generate additional, unique shop names.
+		# Pubs (50)
+		"The Drunken Duck", "The Tipsy Crow", "The Laughing Pint", "The Thirsty Raven", "The Blind Donkey",
+		"The Crooked Antler", "The Rusty Tap", "The Jolly Badger", "The Howling Wolf", "The Black Boar",
+		"The Lazy Otter", "The Old Barrel", "The Drunken Stag", "The Wandering Mule", "The Dapper Fox",
+		"The Stout & Crown", "The Pickled Herring", "The Cursed Hound", "The Amber Keg", "The Gilded Goat",
+		"The Wicked Ale", "The Salty Dog", "The Dancing Tankard", "The Broken Stein", "The Brass Tap",
+		"The Grinning Cat", "The Bitter End", "The Hidden Flask", "The Clover & Oak", "The Cozy Tankard",
+		"The Muddy Boot", "The Sleepy Bear", "The Wandering Barrel", "The Noble Fir", "The Twisted Hop",
+		"The Thirsty Troll", "The Tipsy Wren", "The Grumpy Monk", "The Blue Ox", "The Wandering Elk",
+		"The Rusted Crown", "The Lucky Duck", "The Hoppy Fox", "The Kraken’s Cup", "The Red Lantern",
+		"The Midnight Mug", "The Grog & Grub", "The Rowdy Raven", "The Broken Horn", "The Lost Lantern", "The Sly Toad"
+	]
 
-Do not number them. Do not include anything else.
+	GENERATE_RESTAURANT_NAMES_PROMPT_TEMPLATE = """You are a creative shop name suggester. Your task is to write a list of 100 unique names, in the format below.
 
-Just output a Python list of strings, wrapped between <list> and </list>.
+	Do not provide any additional information; just output a Python list of strings, wrapped between <list> and </list>.
 
-Example:
-<list>["The Rustic Spoon", "Midnight Roastery", "Fog & Bean", ...]</list>
+	A shop can be a restaurant, coffee shop, or pub.
 
-A shop can be a restaurant, coffee shop, or pub.
+	Example output:
+	<list>[(1, '{}'), (2, '{}'), ..., (100, '{}')]</list>"""
 
-Existing names: {}
-"""
+	prompts = []
+	for _ in range(prompt_factor):
+		chosen_names = np.random.choice(SHOP_NAMES, replace=False, size=3)
+		
+		messages = [
+			{
+				"role": "user", 
+				"content": GENERATE_RESTAURANT_NAMES_PROMPT_TEMPLATE.format(
+					chosen_names[0], 
+					chosen_names[1], 
+					chosen_names[2]
+				)
+			}
+		]
+		prompt = tokenizer.apply_chat_template(
+			messages,
+			tokenize=False,
+			add_generation_prompt=True,
+			enable_thinking=False
+		)
+		prompts.append(prompt)
+	return prompts
 
-with open("data/unique_names.txt", "r") as f:
-    names = [line.strip() for line in f if line.strip()]
 
-existing_names = set(names)
-errors = 0
-patience_threshold = 20
+def main():
+	prompt_factor = 20
 
-while len(names) < 100 and errors < patience_threshold:
-    prompt = GENERATE_RESTAURANT_NAMES_PROMPT.format(names)
+	print("Loading model")
+	llm = LLM(
+		"Qwen/Qwen3-4B",
+		max_model_len=1000,
+		max_num_seqs=prompt_factor,
+		dtype="auto",
+		trust_remote_code=True,
+		quantization="fp8"
+	)
+	print("Loaded model")
+	tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen3-4B")
 
-    outputs = llm.generate([prompt], sampling_params=sampling_params)
+	sampling_params = SamplingParams(
+		temperature=0.85,
+		top_k=20,
+		top_p=0.8,
+		max_tokens=1300
+	)
 
-    for output in outputs:
-        text = output.outputs[0].text.strip()
-        match = re.search(r"<list>(.*?)</list>", text, re.DOTALL)
 
-        if not match:
-            print("No <list> tag found. Output was:")
-            print(text)
-            errors += 1
-            continue
+	with open("data/unique_names.txt", "r") as f:
+		original_names = [line.strip() for line in f if line.strip()]
 
-        list_str = match.group(1).strip()
+	names = original_names
+	TARGET_NAME_COUNT = 10000
+	try:
+		while len(names) < TARGET_NAME_COUNT + len(original_names):
+			print(len(names))
+			outputs = llm.generate(
+				get_formatted_prompt(
+					tokenizer=tokenizer,
+					prompt_factor=prompt_factor
+				), 
+				sampling_params=sampling_params
+			)
 
-        try:
-            parsed_names = ast.literal_eval(f"[{list_str}]" if not list_str.startswith("[") else list_str)
-            new_names = [name for name in parsed_names if isinstance(name, str) and name not in existing_names]
+			for output in outputs:
+				text = output.outputs[0].text.strip()
 
-            if not new_names:
-                errors += 1
-                print("No new valid names found.")
-                continue
+				match = re.search(r"<list>(.*?)</list>", text, re.DOTALL)
 
-            names.extend(new_names)
-            existing_names.update(new_names)
-            print(f"Added {len(new_names)} new names. Total: {len(names)}")
+				if not match:
+					print("No <list> tag found. Output was:")
+					print(text)
+					continue
 
-        except Exception as e:
-            print(f"Parsing failed: {e}")
-            errors += 1
+				list_tuples = match.group(1).strip()
 
-with open("data/synthetic_names.txt", "w") as f:
-    for idx, name in enumerate(names, start=1):
-        f.write("\n".join(names))
+				try:
+					parsed_names = ast.literal_eval(list_tuples)
+					for i, name in parsed_names:
+						names.append(name)
+					names = list(set(names))
+				except Exception as e:
+					print(f"Parsing failed: {e}")
 
-print("Done. Names written to data/synthetic_names.txt")
+	except Exception as e:
+		print(f"Error: {e}")
+
+	finally:
+		names = list(set(names))
+		for orig_name in original_names:
+			if orig_name in names:
+				names.remove(orig_name)
+		with open("data/synthetic_names.txt", "w") as f:
+			f.write("\n".join(names))
+
+	print("Done. Names written to data/synthetic_names.txt")
+
+
+if __name__ == "__main__":
+	main()
