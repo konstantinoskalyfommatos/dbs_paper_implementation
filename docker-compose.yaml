@@ -1,0 +1,53 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: always
+    container_name: qdrant
+    ports:
+      - 6333:6333
+      - 6334:6334
+    expose:
+      - 6333
+      - 6334
+      - 6335
+    configs:
+      - source: qdrant_config
+        target: /qdrant/config/production.yaml
+    volumes:
+      - ./qdrant_data:/qdrant/storage
+
+  retrieval_component:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, utility]
+    environment:
+      - PYTHONPATH=src/
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    runtime: nvidia
+    ports:
+      - "8000:8000"
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./:/home/retrieval_component:cached
+      - logs:/home/retrieval_component/logs
+      - ./storage:/home/retrieval_component/storage
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - .env:/home/retrieval_component/.env
+    depends_on:
+      - qdrant
+
+configs:
+  qdrant_config:
+    content: |
+      log_level: INFO
+
+volumes:
+  logs:

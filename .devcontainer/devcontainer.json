@@ -1,0 +1,12 @@
+{
+    "name": "retrieval_component",
+    "dockerComposeFile": "../docker-compose.yaml",
+    "service": "retrieval_component",
+    "workspaceFolder": "/home/retrieval_component",
+    "forwardPorts": [6333, 9200, 9600],
+    "shutdownAction": "stopCompose",
+    "containerEnv": {
+      "PYTHONPATH": "/home/retrieval_component/src"
+    },
+    "remoteUser": "root"
+  }
