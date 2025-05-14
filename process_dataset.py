@@ -26,16 +26,17 @@ data_df = pd.read_csv(data_filepath)
 data_df.drop(["mr"], inplace=True, axis=1)
 data_df['Original Name'] = data_df['orig_mr'].apply(lambda x: x.split('name[')[1].split(']')[0])
 
+#TODO 24 values are out with this filtering
 data_df = data_df[data_df[['Original Name', 'ref']].apply(lambda row: row['Original Name'] in row['ref'], axis=1)].reset_index(drop=True)
 names_dict = {}
 
 
-def create_new_data_point(orig_data: pd.Series, synthetic_name: str, ) -> dict:
+def create_new_data_point(orig_data: pd.Series, _synthetic_name: str, ) -> dict:
     res = {}
     for name in orig_data.index:
         res[name] = orig_data[name]
 
-    res['Synthetic Name'] = synthetic_name
+    res['Synthetic Name'] = _synthetic_name
     res['synthetic ref'] = res['ref'].replace(res['Original Name'], res['Synthetic Name'])
     res['synthetic orig_mr'] = res['orig_mr'].replace(res['Original Name'], res['Synthetic Name'])
     return res
@@ -64,7 +65,7 @@ for idx, synthetic_name in enumerate(synthetic_names):
         indices = np.random.choice(names_dict[name], size=_size, replace=False)
         for index in indices:
             new_dataset.append(create_new_data_point(orig_data=data_df.iloc[index],
-                                                     synthetic_name=synthetic_name,
+                                                     _synthetic_name=synthetic_name,
                                                      ))
 
             names_dict[name].remove(index)
