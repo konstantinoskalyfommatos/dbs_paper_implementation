@@ -2,3 +2,4 @@
 .idea
 qdrant_data/
 __pycache__
+data/similarity_dict.json
