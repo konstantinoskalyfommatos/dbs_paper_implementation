@@ -7,7 +7,7 @@ from torch.nn import functional as F
 from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer
 from transformers import DPRContextEncoder, DPRContextEncoderTokenizer
 from torch import nn
-
+import random
 
 class DPRDataset(Dataset):
     def __init__(self, data, question_tokenizer, context_tokenizer, max_length=256):
@@ -19,45 +19,20 @@ class DPRDataset(Dataset):
     def __len__(self):
         return len(self.data)
     
-    def _serialize_query(table: str) -> dict[str, str]:
-        """Returns the table as a dictionary.
-        
-        Example: 'name[The Hollow Bell Café], eatType[restaurant], priceRange[more than £30], familyFriendly[no]'
-        """
-        result = ""
-        input_string = input_string.strip()
-        
-        # Split by comma to get individual attribute-value pairs
-        pairs = input_string.split(', ')
-        
-        dict_table = {}
-        for pair in pairs:
-            key = pair.split("[")[0].strip()
-            value = pair.split("[")[1].replace("]", "").strip()
-            dict_table[key] = value
-
-        # TODO: FINISH THIS
-        for key, value in dict_table.items():
-            results += f"<R>"
-
-        return result
-
     def __getitem__(self, idx):
         item = self.data[idx]
-        query = item["query"]
-        pos = item["positive"]
+        serialized_query = self._serialize_query(item["table_str"])
+        
+        positive = item["positive"]
         negs = item.get("negative", [])
         hard_negs = item.get("hard_negative", [])
 
-        # Take one positive, one negative, one hard negative (if any)
-        positive = pos[0]
         negative = negs[0] if negs else None
         hard_negative = hard_negs[0] if hard_negs else None
 
-        query_enc = self.q_tokenizer(query, truncation=True, padding="max_length", max_length=self.max_length, return_tensors="pt")
+        query_enc = self.q_tokenizer(serialized_query, truncation=True, padding="max_length", max_length=self.max_length, return_tensors="pt")
         pos_enc = self.ctx_tokenizer(positive, truncation=True, padding="max_length", max_length=self.max_length, return_tensors="pt")
         
-        # Negatives are optional
         if negative:
             neg_enc = self.ctx_tokenizer(negative, truncation=True, padding="max_length", max_length=self.max_length, return_tensors="pt")
         else:
@@ -78,6 +53,34 @@ class DPRDataset(Dataset):
             "hard_neg_input_ids": hard_neg_enc["input_ids"].squeeze() if hard_neg_enc else None,
             "hard_neg_attention_mask": hard_neg_enc["attention_mask"].squeeze() if hard_neg_enc else None,
         }
+    
+    @staticmethod
+    def _serialize_query(table: str) -> dict[str, str]:
+        """Returns the table as a dictionary.
+        
+        Example: 'name[The Hollow Bell Café], eatType[restaurant], priceRange[more than £30], familyFriendly[no]'
+
+        # NOTE: 3.1.2 in paper.
+        """
+        results = []
+        table = table.strip()
+        
+        # Split by comma to get individual attribute-value pairs
+        pairs = table.split(', ')
+        
+        dict_table = {}
+        for pair in pairs:
+            key = pair.split("[")[0].strip()
+            value = pair.split("[")[1].replace("]", "").strip()
+            dict_table[key] = value
+
+        dict_table[random.choice([key for key in dict_table.keys() if key != 'name'])] = ''
+        del dict_table[random.choice([key for key in dict_table.keys() if key != 'name'])]
+
+        for key, value in dict_table.items():
+            results.append(f"<R>{key}<R>{value}<R>")
+
+        return '<C>'.join(results)
 
 
 class DPRTrainer(Trainer):
@@ -92,6 +95,7 @@ class DPRTrainer(Trainer):
         scores = torch.matmul(q_embeds, p_embeds.T)  # shape: (B, B)
         labels = torch.arange(len(scores)).to(scores.device)
         loss = F.cross_entropy(scores, labels)
+        
         return (loss, scores) if return_outputs else loss
 
 

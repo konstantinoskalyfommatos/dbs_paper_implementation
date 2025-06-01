@@ -29,9 +29,8 @@ for i in tqdm(range(LEN_SENTENCES)):
     negative_indices = sorted_indices[(LEN_SENTENCES // 2 - 2) : (LEN_SENTENCES // 2 + 3)]
 
     similarity_dict[i] = {
-        "ref": sentences[i],
         "table_str": df.iloc[i]["synthetic orig_mr"],
-        "positive": {int(idx): sentences[idx] for idx in same_name_indices},
+        "positive": sentences[i],
         "negative": {int(idx): sentences[idx] for idx in negative_indices},
         "hard_negative": {int(idx): sentences[idx] for idx in hard_negative_indices}
     }
