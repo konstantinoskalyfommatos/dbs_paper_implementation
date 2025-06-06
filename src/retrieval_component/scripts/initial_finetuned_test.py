@@ -112,11 +112,11 @@ if __name__ == "__main__":
     context_encoder_name = "facebook/dpr-ctx_encoder-single-nq-base"
 
 
-    question_encoder = DPRQuestionEncoder.from_pretrained(question_encoder_name)
-    ctx_encoder = DPRContextEncoder.from_pretrained(context_encoder_name)
+    # question_encoder = DPRQuestionEncoder.from_pretrained(question_encoder_name)
+    # ctx_encoder = DPRContextEncoder.from_pretrained(context_encoder_name)
 
-    # question_encoder = DPRQuestionEncoder.from_pretrained('dpr_finetuned_question_encoder')
-    # ctx_encoder = DPRContextEncoder.from_pretrained('dpr_finetuned_ctx_encoder')
+    question_encoder = DPRQuestionEncoder.from_pretrained('dpr_finetuned_question_encoder')
+    ctx_encoder = DPRContextEncoder.from_pretrained('dpr_finetuned_ctx_encoder')
 
 
 
