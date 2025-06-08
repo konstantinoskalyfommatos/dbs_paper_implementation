@@ -9,8 +9,12 @@ from tqdm import tqdm
 import random
 random.seed(42)
 
-def serialize_query(table: str, truncate: bool = True) -> str:
-    results = []
+
+
+def table_to_dict(table: str) -> tuple[dict, dict]:
+    """Returns two dictionaries from a string representation of a table.
+    
+    The first dictionary is the full table, and the second is a truncated version."""
     table = table.strip()
     pairs = table.split(', ')
     dict_table = {}
@@ -21,29 +25,45 @@ def serialize_query(table: str, truncate: bool = True) -> str:
             value = key_value[1].replace("]", "").strip()
             dict_table[key] = value
 
-    if truncate:
-        keys_without_name = [key for key in dict_table.keys() if key != 'name']
+    # Randomly truncate
+    trunc_dict_table = dict_table.copy()
+    keys_without_name = [key for key in trunc_dict_table.keys() if key != 'name']
 
-        if len(dict_table) > 1 and keys_without_name:
-            key_to_empty = random.choice(keys_without_name)
-            # Ensure the key_to_empty is not the only non-name key if we intend to delete another one
-            temp_keys_without_name_and_empty = [k for k in keys_without_name if k != key_to_empty]
+    if len(trunc_dict_table) > 1 and keys_without_name:
+        key_to_empty = random.choice(keys_without_name)
+        temp_keys_without_name_and_empty = [k for k in keys_without_name if k != key_to_empty]
 
-            dict_table[key_to_empty] = ''  # Modify a random non-'name' field to be empty
+        trunc_dict_table[key_to_empty] = ''
 
-            # Delete another random non-'name' field if available
-            if temp_keys_without_name_and_empty:  # If there are other non-name keys left
-                key_to_delete = random.choice(temp_keys_without_name_and_empty)
-                del dict_table[key_to_delete]
-            # If after emptying, only 'name' and the (now empty) key_to_empty remains,
-            # or if there was only one non-name key to begin with, we can't delete another distinct non-name key.
-            elif len(keys_without_name) == 1 and 'name' in dict_table and len(
-                    dict_table) > 1:  # Only one non-name key existed
-                pass  # Cannot delete another non-name key as it was the one emptied
+        if temp_keys_without_name_and_empty:
+            key_to_delete = random.choice(temp_keys_without_name_and_empty)
+            del trunc_dict_table[key_to_delete]
 
-    for key, value in dict_table.items():
-        results.append(f"<r>{key}<r>{value}<r>")
-    return '<c>'.join(results)
+        elif (
+            len(keys_without_name) == 1 and 
+            'name' in trunc_dict_table and 
+            len(trunc_dict_table) > 1
+        ):
+            pass
+
+    return dict_table, trunc_dict_table
+
+
+def serialize_dict(dict_table: dict, format_type: str = "columnar") -> str:
+    """Serializes a dictionary into a string format."""
+    results = []
+    if format_type == "columnar":
+        for key, value in dict_table.items():
+            results.append(f"<r>{key}<r>{value}<r>")
+        return '<c>'.join(results)
+    
+    elif format_type == "csv":
+        columns_row = "|".join([key for key in dict_table.keys()])
+        values_row = "|".join([value for value in dict_table.values()])
+        return f"{columns_row}\n{values_row}"
+    
+    else:
+        raise ValueError("Unsupported format type. Use 'columnar' or 'csv'.")
 
 
 def main():
@@ -69,9 +89,13 @@ def main():
         hard_negative_indices = sorted_indices[:5]
         negative_indices = sorted_indices[(LEN_SENTENCES // 2 - 2) : (LEN_SENTENCES // 2 + 3)]
 
+        full_dict_table, trunc_dict_table = table_to_dict(df.iloc[i]["synthetic orig_mr"])
+
         similarity_dict[i] = {
-            "truncated_serialized_query": serialize_query(df.iloc[i]["synthetic orig_mr"], truncate=True),
-            "serialized_query": serialize_query(df.iloc[i]["synthetic orig_mr"], truncate=False),
+            "truncated_serialized_query": serialize_dict(trunc_dict_table, format_type="columnar"),
+            "serialized_query": serialize_dict(full_dict_table, format_type="columnar"),
+            "truncated_serialized_query_csv": serialize_dict(trunc_dict_table, format_type="csv"),
+            "serialized_query_csv": serialize_dict(full_dict_table, format_type="csv"),
             "ground_truth_retrieved": df[df["Synthetic Name"]== name]['synthetic ref'].to_list(),
             "table_str": df.iloc[i]["synthetic orig_mr"],
             "positive": sentences[i],

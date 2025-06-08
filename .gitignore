@@ -5,3 +5,4 @@ qdrant_data/
 __pycache__
 data/dataset_dict.json
 models/
+src/augmentation_component/unsloth_compiled_cache/
