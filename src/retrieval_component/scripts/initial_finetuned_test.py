@@ -41,8 +41,8 @@ def _serialize_query(table: str) -> str:
             pass  # Cannot delete another non-name key as it was the one emptied
 
     for key, value in dict_table.items():
-        results.append(f"<R>{key}<R>{value}<R>")
-    return '<C>'.join(results)
+        results.append(f"<r>{key}<r>{value}<r>")
+    return '<c>'.join(results)
 
 
 
@@ -115,14 +115,14 @@ if __name__ == "__main__":
     # question_encoder = DPRQuestionEncoder.from_pretrained(question_encoder_name)
     # ctx_encoder = DPRContextEncoder.from_pretrained(context_encoder_name)
 
-    question_encoder = DPRQuestionEncoder.from_pretrained('dpr_finetuned_question_encoder')
-    ctx_encoder = DPRContextEncoder.from_pretrained('dpr_finetuned_ctx_encoder')
+    question_encoder = DPRQuestionEncoder.from_pretrained('./models/dpr_finetuned_question_encoder')
+    ctx_encoder = DPRContextEncoder.from_pretrained('./models/dpr_finetuned_ctx_encoder')
 
 
 
 
     q_tokenizer = DPRQuestionEncoderTokenizer.from_pretrained(question_encoder_name)
-    new_tokens = ["<R>", "<C>"]
+    new_tokens = ["<r>", "<c>"]
     tokens_to_add = [token for token in new_tokens if token not in q_tokenizer.vocab]
     if tokens_to_add:
         q_tokenizer.add_tokens(tokens_to_add)
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     device = 'cuda'
     model.to(device)
 
-    with open('data/similarity_dict.json', 'r') as f:
+    with open('data/dataset_dict.json', 'r') as f:
         data = json.load(f)
 
     result = prepare_dataset(data, 1, question_tokenizer=q_tokenizer, context_tokenizer=ctx_tokenizer)

@@ -26,7 +26,7 @@ class DPRDataset(Dataset):
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         item_key = self.data_keys[idx]
         item = self.data_dict[item_key]
-        serialized_query = self._serialize_query(item["table_str"])
+        serialized_query = self.data_dict[item_key]["truncated_serialized_query"]
 
         positive = item["positive"]
 
@@ -76,8 +76,8 @@ class DPRDataset(Dataset):
                 pass  # Cannot delete another non-name key as it was the one emptied
 
         for key, value in dict_table.items():
-            results.append(f"<R>{key}<R>{value}<R>")
-        return '<C>'.join(results)
+            results.append(f"<r>{key}<r>{value}<r>")
+        return '<c>'.join(results)
 
 
 class DPRDualEncoder(nn.Module):
@@ -222,10 +222,10 @@ if __name__ == "__main__":
     ctx_tokenizer = DPRContextEncoderTokenizer.from_pretrained(context_encoder_name)
 
     try:
-        with open("data/similarity_dict.json", "r") as f:
+        with open("data/dataset_dict.json", "r") as f:
             train_dataset_dict = json.load(f)
     except FileNotFoundError:
-        print("Error: data/similarity_dict.json not found. Please ensure the path is correct.")
+        print("Error: data/dataset_dict.json not found. Please ensure the path is correct.")
         exit()
 
     train_dataset = DPRDataset(train_dataset_dict, q_tokenizer, ctx_tokenizer, max_length=256)  # max_length passed here
