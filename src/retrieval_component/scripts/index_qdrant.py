@@ -10,8 +10,8 @@ import torch
 def encode_dataset(
 	_df: pd.DataFrame, 
 	text_col_name: str,
-	tokenizer: AutoTokenizer = AutoTokenizer.from_pretrained("facebook/dpr-ctx_encoder-single-nq-base"),
-	encoder: nn.Module = DPRContextEncoder.from_pretrained("facebook/dpr-ctx_encoder-single-nq-base"),
+	tokenizer: AutoTokenizer,
+	context_encoder: nn.Module,
 ) -> pd.DataFrame:
 	
 	df = _df.copy(deep=True)
@@ -22,14 +22,14 @@ def encode_dataset(
 		input_ids = tokenizer.encode(sentence, add_special_tokens=True)
 		max_sentence_len = max(max_sentence_len, len(input_ids))
 
-	encoder.to("cuda")
-	encoder.eval()
+	context_encoder.to("cuda")
+	context_encoder.eval()
 	df["embedding"] = None
 	
 	# NOTE: https://github.com/huggingface/setfit/issues/287
 	for idx, row in tqdm(df.iterrows(), total=len(df), desc="Creating vectors"):
 		with torch.no_grad():
-				# Tokenize and encode the sentence
+			# Tokenize and encode the sentence
 			encoded = tokenizer(
 				row[text_col_name],
 				add_special_tokens=True,
@@ -42,17 +42,22 @@ def encode_dataset(
 			
 			input_ids = encoded['input_ids'].to('cuda')
 
-			embedding = encoder(input_ids).pooler_output.squeeze().detach().cpu()
+			embedding = context_encoder(input_ids).pooler_output.squeeze().detach().cpu()
 			df.at[idx, "embedding"] = embedding
 	return df
 
 
 def main():
+	tokenizer = AutoTokenizer.from_pretrained("models/dpr_finetuned_question_tokenizer")
+	context_encoder = DPRContextEncoder.from_pretrained("models/dpr_finetuned_context_encoder")
+
 	df = pd.read_csv("/home/retrieval_component/data/new_train.csv")
 	df.drop(columns=['orig_mr', 'Original Name', 'ref', 'fixed'], inplace=True)
 	df = encode_dataset(
 		_df=df,
-		text_col_name="synthetic ref"
+		text_col_name="synthetic ref",
+		tokenizer=tokenizer,
+		context_encoder=context_encoder,
 	)
 
 	client = QdrantClient(
@@ -60,7 +65,7 @@ def main():
 		port=6333,
 	)
 
-	COLLECTION_NAME = "e2e_documents_pretrained_dpr"
+	COLLECTION_NAME = "e2e_documents_finetuned_dpr"
 
 	if not client.collection_exists(COLLECTION_NAME):
 		client.create_collection(
@@ -70,7 +75,6 @@ def main():
 
 
 	for idx, row in tqdm(df.iterrows(), total=len(df), desc="Upserting vectors"):
-
 		client.upsert(
 			collection_name=COLLECTION_NAME,
 			points=[
@@ -86,7 +90,6 @@ def main():
 		)
 
 	print("Finished")
-
 
 
 if __name__ == "__main__":

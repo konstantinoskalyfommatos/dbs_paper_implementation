@@ -198,7 +198,7 @@ class CustomDPRDataCollator:
                     try:
                         batch[key] = torch.tensor(values)
                     except Exception:
-                        batch[key] = values  # Keep as list if tensor conversion fails
+                        batch[key] = values
                 else:
                     batch[key] = values
 
@@ -264,6 +264,7 @@ if __name__ == "__main__":
 
     print("Starting training...")
     trainer.train()
+    q_tokenizer.save_pretrained("./models/dpr_finetuned_question_tokenizer")
     model.question_encoder.save_pretrained('./dpr_finetuned_question_encoder')
     model.ctx_encoder.save_pretrained('./dpr_finetuned_ctx_encoder')
     print("Training finished.")

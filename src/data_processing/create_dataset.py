@@ -103,15 +103,13 @@ def create_dataset(train_or_test: str) -> None:
     if train_or_test == "train":
         filename = "data/dataset_dict.json"
     else:
-        filename = "data/dataset_dict_test.csv"
+        filename = "data/dataset_dict_test.json"
     with open(filename, "w") as f:
         json.dump(similarity_dict, f, indent=4)
 
 def main():
     create_dataset(train_or_test="train")
     create_dataset(train_or_test="test")
-
-
     
 
 if __name__ == "__main__":
