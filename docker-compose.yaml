@@ -16,7 +16,7 @@ services:
     volumes:
       - ./qdrant_data:/qdrant/storage
 
-  retrieval_component:
+  app:
     build:
       context: ./
       dockerfile: Dockerfile
@@ -36,11 +36,9 @@ services:
     tty: true
     stdin_open: true
     volumes:
-      - ./:/home/retrieval_component:cached
-      - logs:/home/retrieval_component/logs
-      - ./storage:/home/retrieval_component/storage
+      - ./:/home/app:cached
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - .env:/home/retrieval_component/.env
+      - .env:/home/app/.env
     depends_on:
       - qdrant
 

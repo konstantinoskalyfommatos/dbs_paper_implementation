@@ -25,17 +25,14 @@ RUN pip install uv
 RUN uv --version
 
 # Set up workspace
-WORKDIR /retrieval_component
-COPY requirements.txt ./requirements.txt
+WORKDIR /app
+COPY requirements_retrieval.txt ./requirements_retrieval.txt
 
 # Install Python dependencies
-RUN uv pip install --system -r ./requirements.txt
+RUN uv pip install --system -r ./requirements_retrieval.txt
 
-# Create storage and logs directories
-RUN mkdir -p /retrieval_component/storage /retrieval_component/logs && \
-    chmod 777 /retrieval_component/storage /retrieval_component/logs
 
-ENV HOME=/retrieval_component
-COPY . /retrieval_component
+ENV HOME=/app
+COPY . /app
 
 CMD ["bash"]
