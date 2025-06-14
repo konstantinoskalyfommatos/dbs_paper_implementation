@@ -29,12 +29,12 @@ WORKDIR /app
 RUN useradd -m -s /bin/bash appuser && \
     chown -R appuser:appuser /app
 
-USER appuser
-
 COPY requirements.txt ./requirements.txt
 
 # Install Python dependencies
 RUN uv pip install --system -r ./requirements.txt
+
+USER appuser
 
 ENV HOME=/app
 COPY . /app

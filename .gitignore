@@ -8,3 +8,4 @@ models/
 src/augmentation_component/unsloth_compiled_cache/
 .venv*/
 src/augmentation_component/unsloth_compiled_cache
+.unsloth
