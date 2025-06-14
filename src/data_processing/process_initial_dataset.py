@@ -2,6 +2,7 @@ import os
 import json
 import pandas as pd
 import numpy as np
+import hashlib
 
 
 def create_new_train_data_point(orig_data: pd.Series, _synthetic_name: str, ) -> dict:
@@ -78,43 +79,46 @@ def process_dataset(train_or_test: str, data_df: pd.DataFrame, synthetic_names: 
     if train_or_test == "test":
         data_df = data_df[data_df['meaning_representation'].apply(lambda x: 'name' in str(x))].reset_index(
             drop=True)
+        data_df = data_df[[len(references)>=3 for references in data_df['references']]]
+        data_df['hashed_idx'] = pd.Series([hashlib.md5(str(idx).encode()).hexdigest() for idx in data_df.explode('references').index])
         data_df['Original Name'] = data_df['meaning_representation'].apply(lambda x: x.split('name[')[1].split(']')[0])
 
         data_df = data_df.explode('references').reset_index(drop=True)
         data_df = data_df[
             data_df[['Original Name', 'references']].apply(lambda row: row['Original Name'] in row['references'], axis=1)].reset_index(
             drop=True)
-        names_dict = {}
+        indices_dict = {}
 
-        unique_names = np.unique(data_df['Original Name'])
-        for unique_name in unique_names:
-            names_dict[unique_name] = list(data_df[data_df['Original Name'] == unique_name].index)
+        unique_indices = np.unique(data_df['hashed_idx'])
+        for unique_idx in unique_indices:
+            indices_dict[unique_idx] = list(data_df[data_df['hashed_idx'] == unique_idx].index)
 
         new_dataset = []
         for idx, synthetic_name in enumerate(synthetic_names):
             try:
-                name_choices = [_name for _name in names_dict.keys() if len(names_dict[_name]) >= _size]
-                if len(name_choices) == 0:
+                idx_choices = [_idx for _idx in indices_dict.keys() if len(indices_dict[_idx]) >= _size]
+                if len(idx_choices) == 0:
                     _size = _size - 1
-                    name_choices = [_name for _name in names_dict.keys() if len(names_dict[_name]) == _size]
+                    idx_choices = [_name for _name in indices_dict.keys() if len(indices_dict[_name]) == _size]
 
-                name = np.random.choice(name_choices)
-                indices = np.random.choice(names_dict[name], size=_size, replace=False)
-                for index in indices:
-                    new_dataset.append(create_new_test_data_point(orig_data=data_df.iloc[index],
+                rand_idx = np.random.choice(idx_choices)
+                indices = np.random.choice(indices_dict[rand_idx], size=_size, replace=False)
+                for _index in indices:
+                    new_dataset.append(create_new_test_data_point(orig_data=data_df.iloc[_index],
                                                              _synthetic_name=synthetic_name,
                                                              ))
 
-                    names_dict[name].remove(index)
+                    indices_dict[rand_idx].remove(_index)
             except Exception as e:
                 print(e)
                 pass
-
-        pd.DataFrame(new_dataset).to_csv(os.path.join(DATA_DIR, f"new_{train_or_test}.csv"), index=False)
+        result_df = pd.DataFrame(new_dataset)
+        result_df.drop(["hashed_idx"], inplace=True, axis=1)
+        result_df.to_csv(os.path.join(DATA_DIR, f"new_{train_or_test}.csv"), index=False)
 
         unique_names = np.unique(data_df['Original Name'])
         for unique_name in unique_names:
-            names_dict[unique_name] = list(data_df[data_df['Original Name'] == unique_name].index)
+            indices_dict[unique_name] = list(data_df[data_df['Original Name'] == unique_name].index)
 
 
 

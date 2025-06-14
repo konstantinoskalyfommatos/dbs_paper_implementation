@@ -100,11 +100,8 @@ def create_dataset(train_or_test: str) -> None:
             "negative": {int(idx): sentences[idx] for idx in negative_indices},
             "hard_negative": {int(idx): sentences[idx] for idx in hard_negative_indices}
         }
-    if train_or_test == "train":
-        filename = "data/dataset_dict.json"
-    else:
-        filename = "data/dataset_dict_test.json"
-    with open(filename, "w") as f:
+
+    with open(f"data/dataset_dict_{train_or_test}.json", "w") as f:
         json.dump(similarity_dict, f, indent=4)
 
 def main():
