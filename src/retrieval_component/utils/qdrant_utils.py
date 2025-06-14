@@ -6,8 +6,8 @@ def retrieve_most_similar_docs(
 	query: str,
 	client: QdrantClient,
 	collection_name: str,
-	tokenizer: AutoTokenizer = AutoTokenizer.from_pretrained("facebook/dpr-question_encoder-single-nq-base"),
-	encoder: nn.Module = DPRQuestionEncoder.from_pretrained("facebook/dpr-question_encoder-single-nq-base"),
+	tokenizer: AutoTokenizer,
+	encoder: nn.Module,
 	limit=5
 ):
 	encoder.to("cuda")

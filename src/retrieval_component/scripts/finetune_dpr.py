@@ -198,7 +198,7 @@ class CustomDPRDataCollator:
                     try:
                         batch[key] = torch.tensor(values)
                     except Exception:
-                        batch[key] = values  # Keep as list if tensor conversion fails
+                        batch[key] = values
                 else:
                     batch[key] = values
 
@@ -222,22 +222,21 @@ if __name__ == "__main__":
     ctx_tokenizer = DPRContextEncoderTokenizer.from_pretrained(context_encoder_name)
 
     try:
-        with open("data/dataset_dict.json", "r") as f:
+        with open("data/dataset_dict_train.json", "r") as f:
             train_dataset_dict = json.load(f)
     except FileNotFoundError:
-        print("Error: data/dataset_dict.json not found. Please ensure the path is correct.")
+        print("Error: data/dataset_dict_train.json not found. Please ensure the path is correct.")
         exit()
 
     train_dataset = DPRDataset(train_dataset_dict, q_tokenizer, ctx_tokenizer, max_length=256)  # max_length passed here
 
     training_args = TrainingArguments(
-        output_dir="./dpr_finetuned",
         per_device_train_batch_size=32,
         learning_rate=1e-5,
-        num_train_epochs=1,
+        num_train_epochs=2,
         logging_dir='./logs',
         logging_steps=10,
-        save_strategy="epoch",
+        save_strategy="no",
         report_to="none"
     )
 
@@ -264,6 +263,7 @@ if __name__ == "__main__":
 
     print("Starting training...")
     trainer.train()
-    model.question_encoder.save_pretrained('./dpr_finetuned_question_encoder')
-    model.ctx_encoder.save_pretrained('./dpr_finetuned_ctx_encoder')
+    q_tokenizer.save_pretrained("./models/dpr_finetuned_question_tokenizer")
+    model.question_encoder.save_pretrained('./models/dpr_finetuned_question_encoder')
+    model.ctx_encoder.save_pretrained('./models/dpr_finetuned_ctx_encoder')
     print("Training finished.")

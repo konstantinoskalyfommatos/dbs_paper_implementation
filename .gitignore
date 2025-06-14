@@ -3,5 +3,7 @@
 .vscode
 qdrant_data/
 __pycache__
-data/dataset_dict.json
+data/dataset_dict_*.json
 models/
+src/augmentation_component/unsloth_compiled_cache/
+.venv*/

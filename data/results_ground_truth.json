@@ -1,0 +1,122 @@
+{
+  "0": {
+    "truncated_serialized_query_csv": "name|eatType|food|priceRange|area|familyFriendly|near\nThe Hollow Bell Caf\u00e9|pub|French||riverside|no|Crowne Plaza Hotel",
+    "enriched_truncated_serialized_query_csv": "name|eatType|food|priceRange|area|familyFriendly|near\nThe Hollow Bell Caf\u00e9|pub|French|more than \u00a330|riverside|no|Crowne Plaza Hotel",
+    "serialized_query_csv": "name|eatType|food|priceRange|customer rating|area|familyFriendly|near\nThe Hollow Bell Caf\u00e9|pub|French|more than \u00a330|low|riverside|no|Crowne Plaza Hotel",
+    "ground_truth_retrieved": [
+      "The Hollow Bell Caf\u00e9 is  pub that serve French food but is not children friendly and ranges more than \u00a330 but has a low rating. It's located in riverside near Crowne Plaza Hotel.",
+      "If you are looking for a family-friendly French  pub in the city centre you should try The Hollow Bell Caf\u00e9. located near to Crowne Plaza Hotel.  Prices are reasonable but ratings are low.",
+      "Located in the city centre near Crowne Plaza Hotel, The Hollow Bell Caf\u00e9 is a family-friendly pub with French cuisine. Prices are less than \u00a320. Customers give it an average rating.",
+      "The Hollow Bell Caf\u00e9 is a low priced pub on the river located near Raja Indian Cuisine",
+      "Welcome to The Hollow Bell Caf\u00e9, we are a restaurant. We're family-friendly we serve fast food we are located in the city centre near the Raja Indian Cuisine."
+    ]
+  },
+  "1": {
+    "truncated_serialized_query_csv": "name|food|priceRange|customer rating|area|familyFriendly|near\nThe Hollow Bell Caf\u00e9|French|moderate|low|city centre|yes|",
+    "enriched_truncated_serialized_query_csv": "name|food|priceRange|customer rating|area|familyFriendly|near\nThe Hollow Bell Caf\u00e9|French|moderate|low|city centre|yes|Crowne Plaza Hotel",
+    "serialized_query_csv": "name|eatType|food|priceRange|customer rating|area|familyFriendly|near\nThe Hollow Bell Caf\u00e9|pub|French|moderate|low|city centre|yes|Crowne Plaza Hotel",
+    "ground_truth_retrieved": [
+      "The Hollow Bell Caf\u00e9 is  pub that serve French food but is not children friendly and ranges more than \u00a330 but has a low rating. It's located in riverside near Crowne Plaza Hotel.",
+      "If you are looking for a family-friendly French  pub in the city centre you should try The Hollow Bell Caf\u00e9. located near to Crowne Plaza Hotel.  Prices are reasonable but ratings are low.",
+      "Located in the city centre near Crowne Plaza Hotel, The Hollow Bell Caf\u00e9 is a family-friendly pub with French cuisine. Prices are less than \u00a320. Customers give it an average rating.",
+      "The Hollow Bell Caf\u00e9 is a low priced pub on the river located near Raja Indian Cuisine",
+      "Welcome to The Hollow Bell Caf\u00e9, we are a restaurant. We're family-friendly we serve fast food we are located in the city centre near the Raja Indian Cuisine."
+    ]
+  },
+  "2": {
+    "truncated_serialized_query_csv": "name|eatType|food|priceRange|area|familyFriendly|near\nThe Hollow Bell Caf\u00e9|pub|French|less than \u00a320|city centre||Crowne Plaza Hotel",
+    "enriched_truncated_serialized_query_csv": "name|eatType|food|priceRange|area|familyFriendly|near\nThe Hollow Bell Caf\u00e9|pub|French|less than \u00a320|city centre|yes|Crowne Plaza Hotel",
+    "serialized_query_csv": "name|eatType|food|priceRange|customer rating|area|familyFriendly|near\nThe Hollow Bell Caf\u00e9|pub|French|less than \u00a320|average|city centre|yes|Crowne Plaza Hotel",
+    "ground_truth_retrieved": [
+      "The Hollow Bell Caf\u00e9 is  pub that serve French food but is not children friendly and ranges more than \u00a330 but has a low rating. It's located in riverside near Crowne Plaza Hotel.",
+      "If you are looking for a family-friendly French  pub in the city centre you should try The Hollow Bell Caf\u00e9. located near to Crowne Plaza Hotel.  Prices are reasonable but ratings are low.",
+      "Located in the city centre near Crowne Plaza Hotel, The Hollow Bell Caf\u00e9 is a family-friendly pub with French cuisine. Prices are less than \u00a320. Customers give it an average rating.",
+      "The Hollow Bell Caf\u00e9 is a low priced pub on the river located near Raja Indian Cuisine",
+      "Welcome to The Hollow Bell Caf\u00e9, we are a restaurant. We're family-friendly we serve fast food we are located in the city centre near the Raja Indian Cuisine."
+    ]
+  },
+  "3": {
+    "truncated_serialized_query_csv": "name|eatType|area|near\nThe Hollow Bell Caf\u00e9|pub||Raja Indian Cuisine",
+    "enriched_truncated_serialized_query_csv": "name|eatType|area|near\nThe Hollow Bell Caf\u00e9|pub|riverside|Raja Indian Cuisine",
+    "serialized_query_csv": "name|eatType|priceRange|area|near\nThe Hollow Bell Caf\u00e9|pub|less than \u00a320|riverside|Raja Indian Cuisine",
+    "ground_truth_retrieved": [
+      "The Hollow Bell Caf\u00e9 is  pub that serve French food but is not children friendly and ranges more than \u00a330 but has a low rating. It's located in riverside near Crowne Plaza Hotel.",
+      "If you are looking for a family-friendly French  pub in the city centre you should try The Hollow Bell Caf\u00e9. located near to Crowne Plaza Hotel.  Prices are reasonable but ratings are low.",
+      "Located in the city centre near Crowne Plaza Hotel, The Hollow Bell Caf\u00e9 is a family-friendly pub with French cuisine. Prices are less than \u00a320. Customers give it an average rating.",
+      "The Hollow Bell Caf\u00e9 is a low priced pub on the river located near Raja Indian Cuisine",
+      "Welcome to The Hollow Bell Caf\u00e9, we are a restaurant. We're family-friendly we serve fast food we are located in the city centre near the Raja Indian Cuisine."
+    ]
+  },
+  "4": {
+    "truncated_serialized_query_csv": "name|eatType|food|area|familyFriendly\nThe Hollow Bell Caf\u00e9|restaurant|Fast food|city centre|",
+    "enriched_truncated_serialized_query_csv": "name|eatType|food|area|familyFriendly\nThe Hollow Bell Caf\u00e9|restaurant|Fast food|city centre|yes",
+    "serialized_query_csv": "name|eatType|food|area|familyFriendly|near\nThe Hollow Bell Caf\u00e9|restaurant|Fast food|city centre|yes|Raja Indian Cuisine",
+    "ground_truth_retrieved": [
+      "The Hollow Bell Caf\u00e9 is  pub that serve French food but is not children friendly and ranges more than \u00a330 but has a low rating. It's located in riverside near Crowne Plaza Hotel.",
+      "If you are looking for a family-friendly French  pub in the city centre you should try The Hollow Bell Caf\u00e9. located near to Crowne Plaza Hotel.  Prices are reasonable but ratings are low.",
+      "Located in the city centre near Crowne Plaza Hotel, The Hollow Bell Caf\u00e9 is a family-friendly pub with French cuisine. Prices are less than \u00a320. Customers give it an average rating.",
+      "The Hollow Bell Caf\u00e9 is a low priced pub on the river located near Raja Indian Cuisine",
+      "Welcome to The Hollow Bell Caf\u00e9, we are a restaurant. We're family-friendly we serve fast food we are located in the city centre near the Raja Indian Cuisine."
+    ]
+  },
+  "5": {
+    "truncated_serialized_query_csv": "name|eatType|customer rating\nThe Roasted Retreat||high",
+    "enriched_truncated_serialized_query_csv": "name|eatType|customer rating\nThe Roasted Retreat|pub|high",
+    "serialized_query_csv": "name|eatType|customer rating|near\nThe Roasted Retreat|pub|high|Caf\u00e9 Sicilia",
+    "ground_truth_retrieved": [
+      "pub located near Caf\u00e9 Sicilia called The Roasted Retreat with a high customer rating",
+      "Near Caf\u00e9 Sicilia is a high rated pub called The Roasted Retreat",
+      "The Roasted Retreat coffee shop is a one star coffee shop located next to Express by Holiday Inn",
+      "For a pub with high customer rating near Caf\u00e9 Sicilia, try The Roasted Retreat.",
+      "Near Caf\u00e9 Sicilia is a high rated coffee shop called The Roasted Retreat"
+    ]
+  },
+  "6": {
+    "truncated_serialized_query_csv": "name|eatType|near\nThe Roasted Retreat||Caf\u00e9 Sicilia",
+    "enriched_truncated_serialized_query_csv": "name|eatType|near\nThe Roasted Retreat|pub|Caf\u00e9 Sicilia",
+    "serialized_query_csv": "name|eatType|customer rating|near\nThe Roasted Retreat|pub|high|Caf\u00e9 Sicilia",
+    "ground_truth_retrieved": [
+      "pub located near Caf\u00e9 Sicilia called The Roasted Retreat with a high customer rating",
+      "Near Caf\u00e9 Sicilia is a high rated pub called The Roasted Retreat",
+      "The Roasted Retreat coffee shop is a one star coffee shop located next to Express by Holiday Inn",
+      "For a pub with high customer rating near Caf\u00e9 Sicilia, try The Roasted Retreat.",
+      "Near Caf\u00e9 Sicilia is a high rated coffee shop called The Roasted Retreat"
+    ]
+  },
+  "7": {
+    "truncated_serialized_query_csv": "name|eatType|near\nThe Roasted Retreat||Express by Holiday Inn",
+    "enriched_truncated_serialized_query_csv": "name|eatType|near\nThe Roasted Retreat|coffee shop|Express by Holiday Inn",
+    "serialized_query_csv": "name|eatType|customer rating|near\nThe Roasted Retreat|coffee shop|low|Express by Holiday Inn",
+    "ground_truth_retrieved": [
+      "pub located near Caf\u00e9 Sicilia called The Roasted Retreat with a high customer rating",
+      "Near Caf\u00e9 Sicilia is a high rated pub called The Roasted Retreat",
+      "The Roasted Retreat coffee shop is a one star coffee shop located next to Express by Holiday Inn",
+      "For a pub with high customer rating near Caf\u00e9 Sicilia, try The Roasted Retreat.",
+      "Near Caf\u00e9 Sicilia is a high rated coffee shop called The Roasted Retreat"
+    ]
+  },
+  "8": {
+    "truncated_serialized_query_csv": "name|eatType|near\nThe Roasted Retreat||Caf\u00e9 Sicilia",
+    "enriched_truncated_serialized_query_csv": "name|eatType|customer rating|near\nThe Roasted Retreat|pub|high|Caf\u00e9 Sicilia",
+    "serialized_query_csv": "name|eatType|customer rating|near\nThe Roasted Retreat|pub|high|Caf\u00e9 Sicilia",
+    "ground_truth_retrieved": [
+      "pub located near Caf\u00e9 Sicilia called The Roasted Retreat with a high customer rating",
+      "Near Caf\u00e9 Sicilia is a high rated pub called The Roasted Retreat",
+      "The Roasted Retreat coffee shop is a one star coffee shop located next to Express by Holiday Inn",
+      "For a pub with high customer rating near Caf\u00e9 Sicilia, try The Roasted Retreat.",
+      "Near Caf\u00e9 Sicilia is a high rated coffee shop called The Roasted Retreat"
+    ]
+  },
+  "9": {
+    "truncated_serialized_query_csv": "name|eatType|near\nThe Roasted Retreat|coffee shop|",
+    "enriched_truncated_serialized_query_csv": "name|eatType|near\nThe Roasted Retreat|coffee shop|Express by Holiday Inn",
+    "serialized_query_csv": "name|eatType|customer rating|near\nThe Roasted Retreat|coffee shop|high|Caf\u00e9 Sicilia",
+    "ground_truth_retrieved": [
+      "pub located near Caf\u00e9 Sicilia called The Roasted Retreat with a high customer rating",
+      "Near Caf\u00e9 Sicilia is a high rated pub called The Roasted Retreat",
+      "The Roasted Retreat coffee shop is a one star coffee shop located next to Express by Holiday Inn",
+      "For a pub with high customer rating near Caf\u00e9 Sicilia, try The Roasted Retreat.",
+      "Near Caf\u00e9 Sicilia is a high rated coffee shop called The Roasted Retreat"
+    ]
+  }
+}
