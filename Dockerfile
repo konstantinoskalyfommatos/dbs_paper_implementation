@@ -24,13 +24,17 @@ RUN pip install --upgrade pip
 RUN pip install uv
 RUN uv --version
 
-# Set up workspace
 WORKDIR /app
-COPY requirements_retrieval.txt ./requirements_retrieval.txt
+
+RUN useradd -m -s /bin/bash appuser && \
+    chown -R appuser:appuser /app
+
+COPY requirements.txt ./requirements.txt
 
 # Install Python dependencies
-RUN uv pip install --system -r ./requirements_retrieval.txt
+RUN uv pip install --system -r ./requirements.txt
 
+USER appuser
 
 ENV HOME=/app
 COPY . /app
