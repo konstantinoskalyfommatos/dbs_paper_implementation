@@ -74,7 +74,7 @@ def process_dataset(train_or_test: str, data_df: pd.DataFrame, synthetic_names: 
                 print(e)
                 pass
 
-        pd.DataFrame(new_dataset).to_csv(os.path.join(DATA_DIR, f"new_{train_or_test}.csv"), index=False)
+        pd.DataFrame(new_dataset).to_csv(os.path.join(DATA_DIR, f"processed_{train_or_test}.csv"), index=False)
 
     if train_or_test == "test":
         data_df = data_df[data_df['meaning_representation'].apply(lambda x: 'name' in str(x))].reset_index(
@@ -114,7 +114,7 @@ def process_dataset(train_or_test: str, data_df: pd.DataFrame, synthetic_names: 
                 pass
         result_df = pd.DataFrame(new_dataset)
         result_df.drop(["hashed_idx"], inplace=True, axis=1)
-        result_df.to_csv(os.path.join(DATA_DIR, f"new_{train_or_test}.csv"), index=False)
+        result_df.to_csv(os.path.join(DATA_DIR, f"processed_{train_or_test}.csv"), index=False)
 
         unique_names = np.unique(data_df['Original Name'])
         for unique_name in unique_names:

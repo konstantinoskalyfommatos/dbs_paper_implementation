@@ -23,6 +23,7 @@ cffi==1.17.1
 charset-normalizer==3.4.2
 click==8.1.8
 cloudpickle==3.1.1
+colorama==0.4.6
 comm==0.2.2
 compressed-tensors==0.9.3
 cupy-cuda12x==13.4.1
@@ -97,6 +98,7 @@ lark==1.2.2
 llguidance==0.7.19
 llvmlite==0.44.0
 lm-format-enforcer==0.10.11
+lxml==5.4.0
 markdown-it-py==3.0.0
 markupsafe==3.0.2
 matplotlib-inline==0.1.7
@@ -187,6 +189,7 @@ rfc3986-validator==0.1.1
 rich==14.0.0
 rich-toolkit==0.14.5
 rpds-py==0.24.0
+sacrebleu==2.5.1
 safetensors==0.5.3
 scikit-learn==1.7.0
 scipy==1.15.3
@@ -202,6 +205,7 @@ soupsieve==2.7
 stack-data==0.6.3
 starlette==0.46.2
 sympy==1.13.1
+tabulate==0.9.0
 terminado==0.18.1
 threadpoolctl==3.6.0
 tiktoken==0.9.0
