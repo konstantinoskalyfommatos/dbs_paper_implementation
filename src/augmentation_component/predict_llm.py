@@ -46,13 +46,13 @@ def main():
     parser = ArgumentParser()
 
     parser.add_argument(
-        "--test_set",
+        "--ground_truth",
         action="store_true",
-        help="When True, predictions will be made for the test set's ground truth documents"
+        help="When True, predictions will be made for the test set's ground truth documents, not DPR Retrieved"
     )
     args = parser.parse_args()
 
-    if args.test_set:
+    if args.ground_truth:
         print("Running predictions for the test set's ground truth documents.")
         DATASET_DICT_PATH = "data/dataset_dict_test.json"
         OUTPUT_JSON_PATH = "data/results_ground_truth_retrieved.json"
@@ -95,7 +95,7 @@ def main():
             "enriched_truncated_serialized_query_csv": ""  # To be filled
         }
         
-        if args.test_set:
+        if args.ground_truth:
             documents = data_point["ground_truth_retrieved"]
         else:
             documents = data_point["dpr_retrieved"]
