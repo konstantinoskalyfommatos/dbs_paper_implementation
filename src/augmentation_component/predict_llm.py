@@ -55,12 +55,12 @@ def main():
     if args.test_set:
         print("Running predictions for the test set's ground truth documents.")
         DATASET_DICT_PATH = "data/dataset_dict_test.json"
-        OUTPUT_JSON_PATH = "data/results_ground_truth.json"
+        OUTPUT_JSON_PATH = "data/results_ground_truth_retrieved.json"
     else:
         # Predictions for ducuments retrieved from DPR index, where s2e documents are used
         print("Running predictions for the DPR index documents.")
         DATASET_DICT_PATH = "data/dataset_dict_test_e2e.json"
-        OUTPUT_JSON_PATH = "data/results_e2e.json"
+        OUTPUT_JSON_PATH = "data/results_dpr_retrieved.json"
     
     result_dict = {}
     
@@ -95,9 +95,14 @@ def main():
             "enriched_truncated_serialized_query_csv": ""  # To be filled
         }
         
+        if args.test_set:
+            documents = data_point["ground_truth_retrieved"]
+        else:
+            documents = data_point["dpr_retrieved"]
+
         formatted_prompt = format_prompts(
             query_table=data_point["truncated_serialized_query_csv"],
-            documents=data_point["ground_truth_retrieved"],
+            documents=documents,
             tokenizer=tokenizer,
         )
         batch_prompts.append(formatted_prompt)
