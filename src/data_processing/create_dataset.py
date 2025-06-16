@@ -69,7 +69,7 @@ def create_dataset(train_or_test: str) -> None:
     # NOTE: Run from the root directory of the project
     model = SentenceTransformer("Alibaba-NLP/gte-base-en-v1.5", trust_remote_code=True)
     model.to("cuda")
-    df = pd.read_csv(f"data/new_{train_or_test}.csv")
+    df = pd.read_csv(f"data/processed_{train_or_test}.csv")
 
     sentences = df["synthetic ref"].tolist()
 
@@ -78,14 +78,15 @@ def create_dataset(train_or_test: str) -> None:
         similarities = model.similarity(embeddings, embeddings)
 
     similarity_dict = {}
-    LEN_SENTENCES = len(sentences)
-    for i in tqdm(range(LEN_SENTENCES)):
+    
+    LEN_DF = len(df)
+    for i, sentence in tqdm(enumerate(sentences)):
         name = df.iloc[i]["Synthetic Name"]
         same_name_indices = df[df["Synthetic Name"] == name].index
 
         sorted_indices = np.argsort(similarities[i])
         hard_negative_indices = sorted_indices[:5]
-        negative_indices = sorted_indices[(LEN_SENTENCES // 2 - 2): (LEN_SENTENCES // 2 + 3)]
+        negative_indices = sorted_indices[(LEN_DF // 2 - 2): (LEN_DF // 2 + 3)]
 
         full_dict_table, trunc_dict_table = table_to_dict(df.iloc[i]["synthetic orig_mr"])
 
@@ -96,7 +97,7 @@ def create_dataset(train_or_test: str) -> None:
             "serialized_query_csv": serialize_dict(full_dict_table, format_type="csv"),
             "ground_truth_retrieved": df[df["Synthetic Name"] == name]['synthetic ref'].to_list(),
             "table_str": df.iloc[i]["synthetic orig_mr"],
-            "positive": sentences[i],
+            "positive": sentence,
             "negative": {int(idx): sentences[idx] for idx in negative_indices},
             "hard_negative": {int(idx): sentences[idx] for idx in hard_negative_indices}
         }
