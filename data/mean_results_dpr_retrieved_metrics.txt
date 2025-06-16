@@ -1,0 +1,6 @@
+DPR header_exact: 0.9266
+DPR header_chrf: 0.9395
+DPR header_bert: 0.9784
+DPR values_exact: 0.7579
+DPR values_chrf: 0.7952
+DPR values_bert: 0.9354

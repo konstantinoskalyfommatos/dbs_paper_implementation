@@ -1,0 +1,6 @@
+Ground Truth header_exact: 0.8956
+Ground Truth header_chrf: 0.9142
+Ground Truth header_bert: 0.9691
+Ground Truth values_exact: 0.6863
+Ground Truth values_chrf: 0.7316
+Ground Truth values_bert: 0.9122
