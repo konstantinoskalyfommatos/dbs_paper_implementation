@@ -10,7 +10,7 @@ def read_data(ground_truth: bool) -> pd.DataFrame():
         filename = './data/results_ground_truth_retrieved_metrics.json'
     else:
         filename = './data/results_dpr_retrieved_metrics.json'
-
+    print(f'Reading {filename} results...')
     with open(filename, 'r') as f:
         data = json.load(f)
 
@@ -71,10 +71,8 @@ def aggregated_values(df: pd.DataFrame, ground_truth: bool, window_size: int = 1
         axes[idx].set_title(f'{val.capitalize()} Metrics')
         axes[idx].legend()
     if ground_truth:
-        plt.title(f'Metrics for {val.capitalize()} - Ground Truth')
         plt.savefig('plots/aggregated_values_ground_truth.png')
     else:
-        plt.title(f'Metrics for {val.capitalize()} - DPR')
         plt.savefig('plots/aggregated_values_dpr.png')
 
 
