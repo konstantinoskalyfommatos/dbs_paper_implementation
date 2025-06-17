@@ -19,7 +19,6 @@ def shift_tokens_right(input_ids: torch.Tensor, pad_token_id: int, decoder_start
 
     if pad_token_id is None:
         raise ValueError("pad_token_id has to be defined.")
-    # replace possible -100 values in labels by pad_token_id
     shifted_input_ids.masked_fill_(shifted_input_ids == -100, pad_token_id)
 
     return shifted_input_ids
@@ -85,9 +84,7 @@ class BartDataset(Dataset):
 
 class BartWithKnnInterpolation(BartForConditionalGeneration):
     def __init__(self, config, contrastive_loss_ratio=0.1, temperature=0.1):
-        # This properly initializes the underlying BART model (self.model) and the LM head (self.lm_head).
         super().__init__(config)
-        # Define only the additional layers needed for your custom logic.
         self.proj_q = nn.Linear(config.d_model, config.d_model)
         self.proj_d = nn.Linear(config.d_model, config.d_model)
         self.contrastive_loss_ratio = contrastive_loss_ratio
@@ -103,7 +100,7 @@ class BartWithKnnInterpolation(BartForConditionalGeneration):
             decoder_input_ids=None,
             decoder_attention_mask=None,
             encoder_outputs=None,
-            attention_mask=None,  # This is used for the cross-attention in the decoder
+            attention_mask=None,
             labels=None,
             use_cache=None,
             return_dict=None,
@@ -167,14 +164,12 @@ class BartWithKnnInterpolation(BartForConditionalGeneration):
                 attentions=None,
             )
 
-        # For training, create `decoder_input_ids` from `labels` if not provided
         if labels is not None and decoder_input_ids is None:
             decoder_input_ids = shift_tokens_right(
                 labels, self.config.pad_token_id, self.config.decoder_start_token_id
             )
 
         # --- DECODER ---
-        # This part is standard and is now compatible with the outputs from the custom encoder logic.
         decoder_outputs = self.model.decoder(
             input_ids=decoder_input_ids,
             attention_mask=decoder_attention_mask,
@@ -193,7 +188,6 @@ class BartWithKnnInterpolation(BartForConditionalGeneration):
             # The shape will be (batch_size, k + 1, hidden_size)
             all_projections = torch.cat([T_p.unsqueeze(1), d_p], dim=1)
 
-            # Normalize the projections
             all_projections = F.normalize(all_projections, p=2, dim=2)
 
             # Calculate cosine similarity
@@ -258,7 +252,7 @@ def main():
         tokenizer,
         max_query_length=128,
         max_doc_length=256,
-        k=5  # Set the desired number of documents
+        k=5
     )
 
     # 3. CREATE DATALOADER
@@ -300,7 +294,7 @@ def main():
             retr_input_ids=inference_batch["retr_input_ids"],
             retr_attention_mask=inference_batch["retr_attention_mask"],
             num_beams=4,
-            max_length=50,  # Reduced max_length for faster generation in this example
+            max_length=50,
             early_stopping=True
         )
 

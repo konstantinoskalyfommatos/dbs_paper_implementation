@@ -15,7 +15,7 @@ USER_PROMPT = """##### Query:
 <table>{}</table>
 
 ##### Documents:
-# {}"""
+{}"""
 
 
 def format_prompts(
