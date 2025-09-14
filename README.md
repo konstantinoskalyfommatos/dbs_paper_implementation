@@ -11,11 +11,8 @@
 
 
 2. **Docker Setup**:  
-- Build and start the Docker container for the project. Ensure all dependencies are installed within the Docker environment.  
-- Example command to build and run the container (adjust as needed):
     ```bash
-      docker build -t project_name .
-      docker run -it --gpus all -v $(pwd):/workspace project_name
+      docker build -t dbs_paper_implementation .
     ```
 
 ---
